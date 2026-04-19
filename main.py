@@ -1,10 +1,12 @@
+
+
 from analyzer import UserConfig, analyze_network
 from report import generateReport
 from collector import get_active_config
 
 from pathlib import Path
 
-
+# for y or n inputs by the user to the prompts made by the script. 
 def bool_helper(prompt: str) -> bool:
     while True:
         value = input(prompt).strip().lower()
@@ -14,7 +16,7 @@ def bool_helper(prompt: str) -> bool:
             return False
         print("Please enter yes(y) or no(n).")
 
-
+# prompts user for the mode
 def getMode() -> str:
     while True:
         mode = input("Choose mode (auto/manual): ").strip().lower()
@@ -22,7 +24,7 @@ def getMode() -> str:
             return mode
         print("Please choose between 'auto' or 'manual'.")
 
-
+# if manual is chosen
 def getManualConfig() -> UserConfig:
     ssid = input("Enter SSID: ").strip()
     encryption_standard = input("Enter encryption type (Open, WEP, WPA, WPA2, WPA3): ").strip()
@@ -45,6 +47,7 @@ def main():
 
     mode = getMode()
 
+    #if auto is chosen
     if mode == "auto":
         config = get_active_config()
 
@@ -68,6 +71,7 @@ def main():
 
     print()
     print(report_txt)
+
     
     saved_file = save_report(config.ssid, report_txt)
     print(f"\n Assessment completed! \n \o/ script ended \o/ \n Report can be found here: {saved_file}")  
@@ -76,7 +80,6 @@ def main():
 
 
 # save report to a txt file and put it on desktop
-
 def save_report(ssid: str, report: str) -> Path:
     save_path = Path.home() /"OneDrive" /"Desktop" /"Weat_Outputs"
     save_file = f"{ssid}_weat_report.txt".replace(" ","_")
