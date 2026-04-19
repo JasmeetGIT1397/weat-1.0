@@ -1,7 +1,9 @@
-import subprocess
-from analyzer import UserConfig
+# collector. py describes the collection of data from the user. 
 
+import subprocess # subprocess to read the output from the command "netsh wlan show interfaces" in powershell
+from analyzer import UserConfig # uses UserConfig class from analyzer
 
+# Runs the command and returns the output
 def run_command(command: list[str]) -> str:
     try:
         result = subprocess.run(
@@ -16,7 +18,7 @@ def run_command(command: list[str]) -> str:
     except FileNotFoundError:
         return ""
 
-
+# Based on the output of the command, returns the Encryption standard
 def define_encryption(security: str) -> str:
     security = security.strip().upper()
     if "WPA3" in security:
@@ -32,7 +34,7 @@ def define_encryption(security: str) -> str:
 
     return "UNKNOWN"
 
-
+# describes what cipher is being used by the wireless network from the output of the command
 def define_cipher(cipher_text: str) -> str:
     cipher_text = cipher_text.strip().upper()
 
@@ -47,7 +49,7 @@ def define_cipher(cipher_text: str) -> str:
 
     return "UNKNOWN"
 
-
+# describes the authentication type in use (personal or enterprise)
 def define_authentication(security: str) -> str:
     security = security.strip().upper()
 
@@ -58,7 +60,7 @@ def define_authentication(security: str) -> str:
 
     return "UNKNOWN"
 
-
+# uses a dictionary to parse the output. Cleaning
 def parse_active_config(output: str) -> dict:
     info = {
         "ssid": "UNKNOWN",
@@ -112,7 +114,7 @@ def parse_active_config(output: str) -> dict:
 
     return info
 
-
+# Get the current config, run the command and clean the output
 def get_active_config() -> UserConfig:
     output = run_command(["netsh", "wlan", "show", "interfaces"])
     data = parse_active_config(output)
