@@ -1,7 +1,9 @@
-from dataclasses import dataclass, field
+# Analyzer - analyses the input obtained by collector and based on that sets the category or risk and the rating. 
+
+from dataclasses import dataclass, field #data class is used in the lieu of constructor, more effective method of "setting" data
 from typing import List
 
-
+# sets the user config
 @dataclass
 class UserConfig:
     ssid: str
@@ -19,7 +21,7 @@ class Result:
     findings: List[str] = field(default_factory=list)
     recommendations: List[str] = field(default_factory=list)
 
-
+# this method analyses the network config and returns a result
 def analyze_network(config: UserConfig) -> Result:
     score = 10.0
     findings = []
@@ -29,6 +31,7 @@ def analyze_network(config: UserConfig) -> Result:
     cipher = config.cipher.strip().upper()
     authentication = config.authentication_type.strip().upper()
 
+    # Encryption standards. 
     if encryption_standard == "OPEN":
         score -= 8
         findings.append("WARNING: The network is open and does not use encryption.")
@@ -43,6 +46,8 @@ def analyze_network(config: UserConfig) -> Result:
         recommendations.append("Upgrade to WPA3-Personal or WPA2-AES for better security.")
     elif encryption_standard == "WPA2":
         findings.append("WPA2 is an acceptable security standard.")
+        
+        # cipher types
         if cipher == "TKIP":
             score -= 4
             findings.append("TKIP is a legacy encryption method and is weak.")
@@ -66,6 +71,7 @@ def analyze_network(config: UserConfig) -> Result:
         findings.append("Unknown or unsupported encryption type.")
         recommendations.append("Verify the network configuration.")
 
+    # The type of authentication used
     if authentication == "PERSONAL":
         findings.append("The network uses personal authentication.")
     elif authentication == "ENTERPRISE":
@@ -73,14 +79,16 @@ def analyze_network(config: UserConfig) -> Result:
         score += 0.5
     else:
         findings.append("The authentication method is unknown.")
-
+    
+    # WPS - takes bool value (True if enabled, False if disabled)
     if config.wps:
         score -= 2
         findings.append("WARNING: WPS is enabled, which increases the security risk.")
         recommendations.append("Disable WPS.")
 
     score = max(0.0, min(score, 10.0))
-
+    
+    # Risk evaluation 
     if score >= 8.5:
         riskLevel = "Low"
     elif score >= 6.5:
